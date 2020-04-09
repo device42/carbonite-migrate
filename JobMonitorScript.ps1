@@ -1,8 +1,8 @@
-﻿# Target server and credentials variables
+# Target server and credentials variables
 
 Try {
     # Import 'Set-D42DeviceStatus' script
-    Import-Module -Name D:\PMPR16\SetDeviceStatus.ps1 -Force
+    Import-Module -Name D:\development\carbonite-migrate\SetDeviceStatus.ps1 -Force
 
     # Read the Migrations.csv file     
     # $migrationPath = Read-Host -Prompt 'Please enter the location of the Migrations.csv file (Enter for default "C:\migrations\Migrations.csv"): '    
@@ -41,7 +41,8 @@ Do {
 
     $Time = Get-Date
     $jobStatus =     
-    "    Time                 : $Time
+    "=============================================================================================================
+    Time                 : $Time
     Job ID               : $($currentJob.Id)
     JobType              : $($currentJob.JobType)
     SourceHostUri        : $($currentJob.SourceHostUri)
@@ -50,8 +51,8 @@ Do {
     TargetState          : $($currentJob.Status.TargetState)
     MessageId            : $($jobStatus.MessageId)
     TimeStamp            : $($jobStatus.TimeStamp)
-    Status               : $($jobStatus.Status)
-    ==========================================================="
+    Status               : $($jobStatus.Status)"
+    
     # | Save-DtJobDiagnostics -ServiceHost $DtTarget
     Add-Content -Path $reportPath -Value $jobStatus
 
@@ -65,13 +66,13 @@ While ($currentJob.Status.HighLevelState -ne 'FailedOver')
 
     # Check to see that the failover has been successful and mark the migrated device as no longer active in D42
     if ($currentJob.Status.HighLevelState -eq 'FailedOver') {
-        Set-D42DeviceStatus -baseURL $D42Host -method Post -username admin -password $DtTargetPassword -devName $device_name -inService no
-        Write-Host $device_name has been deactivated on D42.
+        Write-Host [ Migrated $device_name has been deactivated! ]
+        Set-D42DeviceStatus -baseURL $D42Host -method Post -username admin -password $DtTargetPassword -devName $device_name -inService no        
     }
 }
 Catch {
-    $ErrorMessage = "ERROR: " + $_.Exception.Message
     $FailedItem = $_.Exception.ItemName
+    $ErrorMessage = "ERROR: " + $_.Exception.Message + $FailedItem
     Write-Error -Exception $_.Exception -Message "An error has occurred: 
     $_.Exception.ItemName"
     Add-Content -Path $reportPath -Value $ErrorMessage

@@ -13,6 +13,7 @@
     
     # Authentication
     $apiDeviceURL = $baseURL + "api/1.0/device/"
+    $apiDevice = $baseURL + "api/1.0/devices/name/$devName"
     $reportPath =  "C:\migrations\log.txt"
     $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $username, $password
     $passPlain = $Credential.GetNetworkCredential().Password
@@ -23,12 +24,7 @@
     $headers = @{
         'Authorization' = "Basic $encodedCredentials"
         'Content-Type' = 'application/x-www-form-urlencoded'
-    }
-    
-    $body = @{
-        name= $devName # device name
-        in_service= $inService # yes or no to enable/disable the device
-    }
+    }        
 
     # $result = Invoke-RestMethod -Uri $apiDeviceURL -Body $body -Headers $headers -Method Post -SslProtocol Tls -SkipCertificateCheck 
     Try {    
@@ -55,7 +51,31 @@
         Add-Content -Path $reportPath -Value $ErrorMessage
     }
     Finally {
+        # Disable the migrated device
+        $body = @{
+            name = $devName  # device name
+            in_service = $inService # yes or no to enable/disable the device
+        }
         $result = Invoke-RestMethod -Uri $apiDeviceURL -Body $body -Headers $headers -Method Post 
-        Write-Host $result
+        
+        # Get the old device info
+        $result = Invoke-RestMethod -Uri $apiDevice -Headers $headers -Method Get 
+        
+        # Create the migrated device in D42
+        $arrName = $result.name.split('.')   
+        if ($result.tags.PsObject.BaseObject.ToString() -eq 'System.Object[]') {
+            $tags = ''
+        }     
+        $body = @{
+            name = $arrName[0] + "-m." + $arrName[1] + '.' + $arrName[2]            
+            type = 'virtual'
+            virtual_subtype = "vmware"         
+            in_service = "yes" 
+            service_level = $result.service_level
+            tags = $tags
+            notes = $result.notes
+        }
+        $result = Invoke-RestMethod -Uri $apiDeviceURL -Body $body -Headers $headers -Method Post
+        Write-Host [ $result.msg[2] $result.msg[0] ]
     }
 }
