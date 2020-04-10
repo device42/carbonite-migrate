@@ -81,8 +81,6 @@ Try {
 
     $OtherServers = @($VimTarget)
 
- 
-
     # Create a workload
     $DtWorkloadGUID = New-DtWorkload -ServiceHost $DtSource -WorkloadTypeName $DtWorkloadType
 
@@ -102,7 +100,10 @@ Try {
     # Create the job
     $timestamp = Get-Date -Format "ddMMyyyy.HHmmss"
     # Generate a unique replica name
-    $DtJobOptions.JobOptions.VRAOptions.ReplicaVmInfo.DisplayName = "Replica-$($source_ip).$timestamp"
+    $DtJobOptions.JobOptions.VRAOptions.ReplicaVmInfo.DisplayName = "d42-carbonite-$($source_ip).$timestamp"
+    # The above id is saved to a file for D42 device use
+    $DtJobOptions.JobOptions.VRAOptions.ReplicaVmInfo.DisplayName | Out-File -FilePath .\vmName.txt
+
     # Make the failover start right after mirroring completes (0 - auto start, 1 - manual start)
     $DtJobOptions.JobOptions.CoreMonitorOptions.MonitorConfiguration.ProcessingOptions = 0
     $DtJobGuidForVraMove = New-DtJob -ServiceHost $DtTarget -Source $DtSource -OtherServers $OtherServers -JobType $DtJobType -JobOptions $DtJobOptions.JobOptions
