@@ -3,10 +3,10 @@ Try {
     # Source server and credentials
 
     # Read the Migrations.csv file 
-    $migrationPath = Read-Host -Prompt 'Please enter the location of the Migrations.csv file (Enter for default "C:\migrations\Migrations.csv")'
+    $migrationPath = Read-Host -Prompt 'Please enter the location of the migration CSV file (Without quotes like C:\migrations\carbonite-migration.csv)'
     if (!$migrationPath) {
         # Set the path for the downloaded migrations file here...
-        $migrationPath = 'C:\migrations\Migrations.csv'
+        $migrationPath = 'C:\migrations\carbonite-migration.csv'
     }
     $newstreamreader = New-Object System.IO.StreamReader("$migrationPath")
     $newstreamreader.ReadLine()     # skip the header
@@ -98,12 +98,35 @@ Try {
     $DtJobOptions = Get-DtRecommendedJobOptions -ServiceHost $DtTarget -Source $DtSource -JobType $DtJobType -Workload $DtWorkload -OtherServers $OtherServers
 
     # Create the job
-    $timestamp = Get-Date -Format "ddMMyyyy.HHmmss"
+    $timestamp = Get-Date -Format "yyyyMMdd.HHmmss"
     # Generate a unique replica name
-    $DtJobOptions.JobOptions.VRAOptions.ReplicaVmInfo.DisplayName = "d42-carbonite-$($source_ip).$timestamp"
-    # The above id is saved to a file for D42 device use
+    Write-Host "Usable tags for replica name:
+    {YYYY} = 4 digit year
+    {MM} = 2 digit month
+    {DD} = 2 digit day
+    {HH} = 2 digit hour
+    {SS} = 2 digit second
+    {MS} = milliseconds
+    {IP} = IP of the new VM
+    If no name is entered, a default name will be generated in the following format d42-carbonite-[source ip].[YYYYMMDD]"
+    $UserReplicaName = Read-Host -Prompt 'Please enter the replica name to be created on the ESX server'
+    if (!$UserReplicaName) {
+        $DtJobOptions.JobOptions.VRAOptions.ReplicaVmInfo.DisplayName = "d42-carbonite-$DtSourceName.$timestamp"
+    }  
+    else {
+        $UserReplicaName = $UserReplicaName.
+                                    Replace("{YYYY}" , (Get-Date -Format "yyyy")).
+                                    Replace("{MM}", (Get-Date -Format "MM")).
+                                    Replace("{DD}", (Get-Date -Format "dd")).
+                                    Replace("{MS}", (Get-Date -Format "ms")).
+                                    Replace("{SS}", (Get-Date -Format "ss")).
+                                    Replace("{IP}", $DtSourceName)
+    }
+    
+    # Saving the above id to a file for other scripts to use
     $DtJobOptions.JobOptions.VRAOptions.ReplicaVmInfo.DisplayName | Out-File -FilePath .\vmName.txt
-
+    # Add "vmware" subtype flag for ESX type migrations for D42
+    "vmware" | Out-File -FilePath .\vmName.txt -Append
     # Make the failover start right after mirroring completes (0 - auto start, 1 - manual start)
     $DtJobOptions.JobOptions.CoreMonitorOptions.MonitorConfiguration.ProcessingOptions = 0
     $DtJobGuidForVraMove = New-DtJob -ServiceHost $DtTarget -Source $DtSource -OtherServers $OtherServers -JobType $DtJobType -JobOptions $DtJobOptions.JobOptions

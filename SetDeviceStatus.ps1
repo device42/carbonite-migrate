@@ -62,14 +62,14 @@
         $result = Invoke-RestMethod -Uri $apiDevice -Headers $headers -Method Get 
         
         # Create the migrated device in D42
-        $vmName = Get-Content -Path .\vmName.txt
+        $vmName = (Get-Content -Path .\vmName.txt)[0]
         if ($result.tags.PsObject.BaseObject.ToString() -eq 'System.Object[]') {
             $tags = ''
         }     
         $body = @{
             name = $vmName
             type = 'virtual'
-            virtual_subtype = "vmware"         
+            virtual_subtype = (Get-Content -Path .\vmName.txt)[1]         
             in_service = "yes" 
             service_level = $result.service_level
             tags = $tags
