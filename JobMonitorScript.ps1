@@ -1,15 +1,14 @@
-# Target server and credentials variables
+﻿# Target server and credentials variables
 
 Try {
     # Import 'Set-D42DeviceStatus' script
     Import-Module -Name D:\development\carbonite-migrate\SetDeviceStatus.ps1 -Force
 
-    # Read the Migrations.csv file     
-    # $migrationPath = Read-Host -Prompt 'Please enter the location of the Migrations.csv file (Enter for default "C:\migrations\Migrations.csv"): '    
-    # if (!$migrationPath) {
-    #     $migrationPath = 'C:\migrations\Migrations.csv'
-    # }
-    $migrationPath = 'C:\migrations\Migrations.csv'
+    # Read the migration CSV file     
+    $migrationPath = Read-Host -Prompt 'Please enter the location of the migration CSV file (Without quotes like C:\migrations\carbonite-migration.csv)'    
+    if (!$migrationPath) {
+        $migrationPath = 'C:\migrations\carbonite-migration.csv'
+    }
     $newstreamreader = New-Object System.IO.StreamReader("$migrationPath")
     $newstreamreader.ReadLine()     # skip the header
     $credentials = $newstreamreader.ReadLine().Split(",")
@@ -18,10 +17,19 @@ Try {
     $device_name = $credentials[0]
     $newstreamreader.Dispose()
 
-    $DtTargetName = "10.90.12.2"
-    $DtTargetUserName = "Administrator"
-    $DtTargetPassword = Read-Host -AsSecureString -Prompt "Please enter the password for DTTarget"
-    $D42Host ='https://192.168.56.100/'
+    $DtTargetName = Read-Host -Prompt 'Please enter the DoubleTake target IP'    
+    if (!$DtTargetName) {
+        $DtTargetName = "10.90.12.2"
+    }
+    $DtTargetUserName = Read-Host -Prompt 'Please enter the DoubleTake user name'    
+    if (!$DtTargetUserName) {
+        $DtTargetUserName = "Administrator"
+    }    
+    $DtTargetPassword = Read-Host -AsSecureString -Prompt "Please enter the password for the DoubleTake target"
+    $D42Host = Read-Host -Prompt 'Please enter the DoubleTake host IP'    
+    if (!$D42Host) {
+        $D42Host = "https://192.168.56.100/"
+    }   
     $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $DtTargetUserName, $DtTargetPassword
 
     # Import the Carbonite PowerShell module
