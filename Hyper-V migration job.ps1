@@ -2,10 +2,10 @@
 Try {
 
     # Read the Migrations.csv file 
-    $migrationPath = Read-Host -Prompt 'Please enter the location of the Migrations.csv file (Enter for default "C:\migrations\Migrations.csv")'
+    $migrationPath = Read-Host -Prompt 'Please enter the location of the Migrations.csv file (Enter for default "C:\migrations\carbonite-migration.csv")'
     if (!$migrationPath) {
         # Set the path for the downloaded migrations file here...
-        $migrationPath = 'C:\migrations\Migrations.csv'
+        $migrationPath = 'C:\migrations\carbonite-migration.csv'
     }
     $newstreamreader = New-Object System.IO.StreamReader("$migrationPath")
     $newstreamreader.ReadLine()     # skip the header
