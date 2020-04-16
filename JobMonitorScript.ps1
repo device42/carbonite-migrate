@@ -39,38 +39,38 @@ Try {
     # Login to your target server
     $DtTarget = New-DtServer -Name $DtTargetName -UserName $DtTargetUserName -Password $Credential.GetNetworkCredential().Password
 
-    $reportPath =  "C:\migrations\log.txt"
+    $reportPath = "C:\migrations\log.txt"
 
-Do {
-    # Get the jobs on the target and pass through to create a diagnostics file
-    $currentJob = Get-DtJob -ServiceHost $DtTarget
-    $jobStatus = Get-DtJobActionStatus -ServiceHost $DtTarget -JobId $currentJob.Id
-    #$nl = [Environment]::NewLine
+    Do {
+        # Get the jobs on the target and pass through to create a diagnostics file
+        $currentJob = Get-DtJob -ServiceHost $DtTarget
+        $jobStatus = Get-DtJobActionStatus -ServiceHost $DtTarget -JobId $currentJob.Id
+        #$nl = [Environment]::NewLine
 
-    $Time = Get-Date
-    $jobStatus =     
-    "=============================================================================================================
-    Time                 : $Time
-    Job ID               : $($currentJob.Id)
-    JobType              : $($currentJob.JobType)
-    SourceHostUri        : $($currentJob.SourceHostUri)
-    Health               : $($currentJob.Status.Health)
-    Status               : $($currentJob.Status.HighLevelState)
-    TargetState          : $($currentJob.Status.TargetState)
-    MessageId            : $($jobStatus.MessageId)
-    TimeStamp            : $($jobStatus.TimeStamp)
-    Status               : $($jobStatus.Status)"
+        $Time = Get-Date
+        $jobStatus =     
+        "=============================================================================================================
+        Time                 : $Time
+        Job ID               : $currentJob.Id
+        JobType              : $currentJob.JobType
+        SourceHostUri        : $currentJob.SourceHostUri
+        Health               : $currentJob.Status.Health
+        Status               : $currentJob.Status.HighLevelState
+        TargetState          : $currentJob.Status.TargetState
+        MessageId            : $jobStatus.MessageId
+        TimeStamp            : $jobStatus.TimeStamp
+        Status               : $jobStatus.Status"
     
-    # | Save-DtJobDiagnostics -ServiceHost $DtTarget
-    Add-Content -Path $reportPath -Value $jobStatus
+        # | Save-DtJobDiagnostics -ServiceHost $DtTarget
+        Add-Content -Path $reportPath -Value $jobStatus
 
-    # Write to console
-    Write-Host $jobStatus
+        # Write to console
+        Write-Host $jobStatus
 
-    # Sleep 30 seconds
-    Start-Sleep -Seconds 30
-}
-While ($currentJob.Status.HighLevelState -ne 'FailedOver')
+        # Sleep 30 seconds
+        Start-Sleep -Seconds 30
+    }
+    While ($currentJob.Status.HighLevelState -ne 'FailedOver')
 
     # Check to see that the failover has been successful and mark the migrated device as no longer active in D42
     if ($currentJob.Status.HighLevelState -eq 'FailedOver') {
