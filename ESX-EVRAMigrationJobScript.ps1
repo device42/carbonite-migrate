@@ -23,7 +23,7 @@ Try {
     $DtSourceUserName = $source_user
     $DtSourcePassword = $source_pw
 
-    $reportPath =  "C:\migrations\error.log"
+    $reportPath = "C:\migrations\error.log"
 
     # Target server and credentials (carbonite-template)
     $DtTargetName = Read-Host -Prompt 'Please enter the target IP for the migration'
@@ -115,12 +115,13 @@ Try {
     }  
     else {
         $UserReplicaName = $UserReplicaName.
-                                    Replace("{YYYY}" , (Get-Date -Format "yyyy")).
-                                    Replace("{MM}", (Get-Date -Format "MM")).
-                                    Replace("{DD}", (Get-Date -Format "dd")).
-                                    Replace("{MS}", (Get-Date -Format "ms")).
-                                    Replace("{SS}", (Get-Date -Format "ss")).
-                                    Replace("{IP}", $DtSourceName)
+        Replace("{YYYY}" , (Get-Date -Format "yyyy")).
+        Replace("{HH}", (Get-Date -Format "HH")).
+        Replace("{MM}", (Get-Date -Format "MM")).
+        Replace("{DD}", (Get-Date -Format "dd")).
+        Replace("{MS}", (Get-Date -Format "ms")).
+        Replace("{SS}", (Get-Date -Format "ss")).
+        Replace("{IP}", $DtSourceName)
     }
     
     # Saving the above id to a file for other scripts to use
