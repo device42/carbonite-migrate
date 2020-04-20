@@ -6,17 +6,18 @@
         [string]$method,
         [string]$username,
         [securestring]$password,
-        [string]$devName,
+        [array]$devInfo,
         [ValidateSet('yes', 'no')]
         [string]$inService
     )
     
     # Authentication
     $apiDeviceURL = $baseURL + "api/1.0/device/"
-    $apiDevice = $baseURL + "api/1.0/devices/name/$devName"
-    $reportPath = "C:\migrations\log.txt"
+    $apiDevice = $baseURL + "api/1.0/devices/name/" + $devInfo[0]
+    $reportPath = $PSScriptRoot + "\log.txt"
     $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $username, $password
     $passPlain = $Credential.GetNetworkCredential().Password
+    $vmPath = ($PSScriptRoot + "\vmName.txt")
 
     $encodedCredentials = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("$username`:$passPlain"))
     
@@ -50,10 +51,10 @@
         $_.Exception.ItemName"
         Add-Content -Path $reportPath -Value $ErrorMessage
     }
-    Finally {
+    Finally {        
         # Disable the migrated device
         $body = @{
-            name       = $devName  # device name
+            name       = $devInfo[0]  # device name
             in_service = $inService # yes or no to enable/disable the device
         }
         $result = Invoke-RestMethod -Uri $apiDeviceURL -Body $body -Headers $headers -Method Post 
@@ -62,14 +63,15 @@
         $result = Invoke-RestMethod -Uri $apiDevice -Headers $headers -Method Get 
         
         # Create the migrated device in D42
-        $vmName = (Get-Content -Path .\vmName.txt)[0]
+        $vmName = $devInfo[1]
+        $virtSubtype = $devInfo[3]
         if ($result.tags.PsObject.BaseObject.ToString() -eq 'System.Object[]') {
             $tags = ''
         }     
         $body = @{
             name            = $vmName
             type            = 'virtual'
-            virtual_subtype = (Get-Content -Path .\vmName.txt)[1]         
+            virtual_subtype = $virtSubtype         
             in_service      = "yes" 
             service_level   = $result.service_level
             tags            = $tags

@@ -1,20 +1,19 @@
 # Server to ESX migration job
 Try {
+    # Import the Carbonite PowerShell module
+    # This may be \Service\ or \Console\ depending on your installation
+    Import-Module "C:\Program Files\Carbonite\Replication\Console\DoubleTake.PowerShell.dll"
     # Source server and credentials
-
     # Read the Migrations.csv file 
     $migrationPath = Read-Host -Prompt 'Please enter the location of the migration CSV file (Without quotes like C:\migrations\carbonite-migration.csv)'
     if (!$migrationPath) {
         # Set the path for the downloaded migrations file here...
-        $migrationPath = '.\carbonite-migration.csv'
+        $migrationPath = $PSScriptRoot + '\carbonite-migration.csv'
     }
     $migrationData = Get-Content -Path $migrationPath
-    $reportPath = ".\errors.log"
-    $devInfoPath = ".\vmName.txt"
+    $reportPath = $PSScriptRoot + "\errors.log"
+    $devInfoPath = $PSScriptRoot + "\vmName.txt"
     
-    # Import the Carbonite PowerShell module
-    # This may be \Service\ or \Console\ depending on your installation
-    Import-Module "C:\Program Files\Carbonite\Replication\Console\DoubleTake.PowerShell.dll"
 
     # Process each device from the migrations csv file
     Foreach ($dev in $migrationData) {
@@ -122,6 +121,7 @@ Try {
         else {
             $UserReplicaName = $UserReplicaName.
             Replace("{YYYY}" , (Get-Date -Format "yyyy")).
+            Replace("{HH}", (Get-Date -Format "HH")).
             Replace("{MM}", (Get-Date -Format "MM")).
             Replace("{DD}", (Get-Date -Format "dd")).
             Replace("{MS}", (Get-Date -Format "ms")).
@@ -135,7 +135,8 @@ Try {
 
         # Save the above id to a file for other scripts to use
         # Add "vmware" subtype flag for ESX type migrations for D42
-        $DtJobOptions.JobOptions.VRAOptions.ReplicaVmInfo.DisplayName + "," + $DtJobGuidForVraMove + "," + "vmware" | Out-File -FilePath .\vmName.txt -Append
+        ($DtDeviceName + "," + $DtJobOptions.JobOptions.VRAOptions.ReplicaVmInfo.DisplayName + "," + $DtJobGuidForVraMove + "," + "vmware") | 
+        Out-File -FilePath ($PSScriptRoot + "\vmName.txt") -Append
  
         # Start the job
         Start-DtJob -ServiceHost $DtTarget -JobId $DtJobGuidForVraMove

@@ -1,5 +1,4 @@
-notes-ignore.txt
-vmName.txt
 test.ps1
-carbonite-migration.csv
-errors.log
+*.txt
+*.log
+*.csv
