@@ -8,13 +8,13 @@
         [securestring]$password,
         [array]$devInfo,
         [ValidateSet('yes', 'no')]
-        [string]$inService
+        [string]$inService,
+        [string]$reportPath
     )
     
     # Authentication
     $apiDeviceURL = $baseURL + "api/1.0/device/"
-    $apiDevice = $baseURL + "api/1.0/devices/name/" + $devInfo[0]
-    $reportPath = $PSScriptRoot + "\log.txt"
+    $apiDevice = $baseURL + "api/1.0/devices/name/" + $devInfo[0]    
     $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $username, $password
     $passPlain = $Credential.GetNetworkCredential().Password
     $vmPath = ($PSScriptRoot + "\vmName.txt")
@@ -78,6 +78,7 @@
             notes           = $result.notes
         }
         $result = Invoke-RestMethod -Uri $apiDeviceURL -Body $body -Headers $headers -Method Post
+        Add-Content -Path $reportPath -Value "[$($result.msg[2]) $($result.msg[0])]"
         Write-Host [ $result.msg[2] $result.msg[0] ]
     }
 }

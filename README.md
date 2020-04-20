@@ -23,12 +23,12 @@ Migrate devices using Carbonite Migrate.
 4.	You will be prompted to save a CSV export file with server information for the migration. Save it to some directory. This file is used to enter server data into the PowerShell script and Carbonite job creation.
 # Using a PowerShell Carbonite migration script
 1.	Install the Carbonite client.
-2.	Download the D42 Carbonite PowerShell scripts from the D42 GitHub page at: [Carbonite migration scripts](https://github.com/device42/carbonite-migrate)
-3.	Now run the script by entering its name from the PowerShell: `./ESX-EVRAMigrationJobScript.ps1`
-4.	Answer questions when prompted:  
-![alt](https://i.imgur.com/M3jZS4q.png)
-
-5.	You will also be asked to create a replica name which will be the name of the migrated machine on the VMware server and the name appearing in D42. You can use tags such as: 
+1.	Download the D42 Carbonite PowerShell scripts from the D42 GitHub page at: [Carbonite migration scripts](https://github.com/device42/carbonite-migrate)
+1. Copy the file "C:\Program Files\Carbonite\Replication\Console\DoubleTake.PowerShell.dll" to the folder where you unpacked the Carbonite migrations scripts.
+1.	Now run the script by entering its name from the PowerShell: `./ESX-EVRAMigrationJobScript.ps1`
+1.	Answer questions when prompted:  
+![alt](https://i.imgur.com/fkFYfdU.png)
+1.	You will also be asked to create a replica name which will be the name of the migrated machine on the VMware server and the name appearing in D42. You can use tags such as: 
 
     ```
     {YYYY} = 4 digit year
@@ -40,10 +40,10 @@ Migrate devices using Carbonite Migrate.
     {IP} = IP of the new VM
     ```
     With these tags you can create unique names, for example entering: `"d42-carbonite-{IP}.{YYYY}{MM}{DD}"` will create a name equivalent to: `"d42-carbonite-[vmware host ip].20200412"` for example.
-
-6.	The script will execute and issue a job id # upon completion:
+1.  You should answer 'Yes' for the question about the vmName.txt file
+1.	The script will execute and issue a job id # upon completion:
 ![alt](https://i.imgur.com/5JVARpn.png)
-7.	While the script is running or when it has finished, you will check the job status and modify the D42 device, which was migrated by running the job monitoring script `"JobMonitorScript.ps1"`.
+1.	While the script is running or when it has finished, you will check the job status and modify the D42 device, which was migrated by running the job monitoring script `"JobMonitorScript.ps1"`.
 
 # Using the job monitoring script
 1.	Run the script by entering its name from the PowerShell: `./JobMonitorScript.ps1`

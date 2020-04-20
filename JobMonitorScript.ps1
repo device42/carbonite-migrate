@@ -3,12 +3,11 @@
 Try {
     # Import the Carbonite PowerShell module
     # This may be \Service\ or \Console\ depending on your installation
-    Import-Module "C:\Program Files\Carbonite\Replication\Console\DoubleTake.PowerShell.dll"
+    Import-Module "$PSScriptRoot\DoubleTake.PowerShell.dll"
     # Import 'Set-D42DeviceStatus' script
     Import-Module -Name ($PSScriptRoot + "\SetDeviceStatus.ps1") -Force
 
-    $devInfoPath = $PSScriptRoot + "\vmName.txt"
-    $reportPath = $PSScriptRoot + "\log.txt"
+    $devInfoPath = $PSScriptRoot + "\vmName.txt"    
     [System.Collections.ArrayList]$jobs = Get-Content -Path $devInfoPath
 
     $DtTargetName = Read-Host -Prompt 'Please enter the DoubleTake target IP'    
@@ -33,7 +32,7 @@ Try {
 
     # Create the background job
     $async_job = {
-        param ($DtTarget, $reportPath)
+        param ($DtTarget)
 
         # jobs to be removed from main list upon completion
         $finishedJobs = $jobs.Clone()
@@ -45,7 +44,8 @@ Try {
                 # Set credentials
                 # Get the jobs on the target and pass through to create a diagnostics file
                 $currentJob = Get-DtJob -ServiceHost $DtTarget -JobId $jobInfo[2]
-                $jobStatus = Get-DtJobActionStatus -ServiceHost $DtTarget -JobId $jobInfo[2]            
+                $jobStatus = Get-DtJobActionStatus -ServiceHost $DtTarget -JobId $jobInfo[2]
+                $reportPath = $PSScriptRoot + "\" + $jobInfo[0] + ".log"
 
                 $Time = Get-Date
                 # Wait-Debugger
@@ -63,16 +63,17 @@ Try {
                 Status               : $($jobStatus.Status)"
         
                 # | Save-DtJobDiagnostics -ServiceHost $DtTarget
-                Add-Content -Path $reportPath -Value $jobStatus
-    
+                Add-Content -Path $reportPath -Value $jobStatus    
                 # Write to console
                 Write-Host $jobStatus     
                 
                 if ($currentJob.Status.HighLevelState -eq 'FailedOver') {
                     $finishedJobs.Remove($job)
                     # Check to see that the failover has been successful and mark the migrated device as no longer active in D42
-                    Write-Host [ Migrated $jobInfo[0] has been deactivated! ]
-                    Set-D42DeviceStatus -baseURL $D42Host -method Post -username admin -password $DtTargetPassword -devInfo $jobInfo -inService no        
+                    Add-Content -Path $reportPath -Value "[Migrated $($jobInfo[0]) has been deactivated!]"
+                    Write-Host [Device $jobInfo[0] has been migrated and deactivated on D42!]
+                    
+                    Set-D42DeviceStatus -baseURL $D42Host -method Post -username admin -password $DtTargetPassword -devInfo $jobInfo -inService no -reportPath $reportPath
                 }
             }
             $jobs = $finishedJobs.Clone()
@@ -85,7 +86,7 @@ Try {
     # Launch a background job for each device
     # Set-PSBreakpoint -Script @($PSScriptRoot + "\JobMonitorScript.ps1") -Line 45
     #$j = Start-Job -ScriptBlock $async_job -ArgumentList $jobInfo, $DtTarget, $reportPath
-    Invoke-Command -ScriptBlock $async_job -ArgumentList $DtTarget, $reportPath 
+    Invoke-Command -ScriptBlock $async_job -ArgumentList $DtTarget
 
 }
 Catch {
