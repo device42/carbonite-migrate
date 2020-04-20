@@ -1,3 +1,5 @@
-notes-ignore.txt
-vmName.txt
 test.ps1
+*.txt
+*.log
+*.csv
+*.dll

@@ -6,24 +6,25 @@
         [string]$method,
         [string]$username,
         [securestring]$password,
-        [string]$devName,
+        [array]$devInfo,
         [ValidateSet('yes', 'no')]
-        [string]$inService
+        [string]$inService,
+        [string]$reportPath
     )
     
     # Authentication
     $apiDeviceURL = $baseURL + "api/1.0/device/"
-    $apiDevice = $baseURL + "api/1.0/devices/name/$devName"
-    $reportPath =  "C:\migrations\log.txt"
+    $apiDevice = $baseURL + "api/1.0/devices/name/" + $devInfo[0]    
     $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $username, $password
     $passPlain = $Credential.GetNetworkCredential().Password
+    $vmPath = ($PSScriptRoot + "\vmName.txt")
 
     $encodedCredentials = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("$username`:$passPlain"))
     
     # POST
     $headers = @{
         'Authorization' = "Basic $encodedCredentials"
-        'Content-Type' = 'application/x-www-form-urlencoded'
+        'Content-Type'  = 'application/x-www-form-urlencoded'
     }        
 
     # $result = Invoke-RestMethod -Uri $apiDeviceURL -Body $body -Headers $headers -Method Post -SslProtocol Tls -SkipCertificateCheck 
@@ -40,8 +41,8 @@
             }
 "@
 
-    [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
-    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls11    
+        [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls11    
     }
     Catch {
         $ErrorMessage = "ERROR: " + $_.Exception.Message
@@ -50,10 +51,10 @@
         $_.Exception.ItemName"
         Add-Content -Path $reportPath -Value $ErrorMessage
     }
-    Finally {
+    Finally {        
         # Disable the migrated device
         $body = @{
-            name = $devName  # device name
+            name       = $devInfo[0]  # device name
             in_service = $inService # yes or no to enable/disable the device
         }
         $result = Invoke-RestMethod -Uri $apiDeviceURL -Body $body -Headers $headers -Method Post 
@@ -62,20 +63,22 @@
         $result = Invoke-RestMethod -Uri $apiDevice -Headers $headers -Method Get 
         
         # Create the migrated device in D42
-        $vmName = (Get-Content -Path .\vmName.txt)[0]
+        $vmName = $devInfo[1]
+        $virtSubtype = $devInfo[3]
         if ($result.tags.PsObject.BaseObject.ToString() -eq 'System.Object[]') {
             $tags = ''
         }     
         $body = @{
-            name = $vmName
-            type = 'virtual'
-            virtual_subtype = (Get-Content -Path .\vmName.txt)[1]         
-            in_service = "yes" 
-            service_level = $result.service_level
-            tags = $tags
-            notes = $result.notes
+            name            = $vmName
+            type            = 'virtual'
+            virtual_subtype = $virtSubtype         
+            in_service      = "yes" 
+            service_level   = $result.service_level
+            tags            = $tags
+            notes           = $result.notes
         }
         $result = Invoke-RestMethod -Uri $apiDeviceURL -Body $body -Headers $headers -Method Post
+        Add-Content -Path $reportPath -Value "[$($result.msg[2]) $($result.msg[0])]"
         Write-Host [ $result.msg[2] $result.msg[0] ]
     }
 }

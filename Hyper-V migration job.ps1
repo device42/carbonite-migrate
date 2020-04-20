@@ -22,7 +22,7 @@ Try {
     $DtSourceUserName = $source_user
     $DtSourcePassword = $source_pw
 
-    $reportPath =  "C:\migrations\error.log"
+    $reportPath = "C:\migrations\error.log"
 
     # Target server and credentials (Hyper-V host)
     $DtTargetName = Read-Host -Prompt 'Please enter the target IP for the migration'
