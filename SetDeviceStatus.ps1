@@ -57,10 +57,10 @@
             name       = $devInfo[0]  # device name
             in_service = $inService # yes or no to enable/disable the device
         }
-        $result = Invoke-RestMethod -Uri $apiDeviceURL -Body $body -Headers $headers -Method Post 
+        $result = Invoke-RestMethod -Uri $apiDeviceURL -Body $body -Headers $headers -Method $method 
         
         # Get the old device info
-        $result = Invoke-RestMethod -Uri $apiDevice -Headers $headers -Method Get 
+        $result = Invoke-RestMethod -Uri $apiDevice -Headers $headers -Method Get
         
         # Create the migrated device in D42
         $vmName = $devInfo[1]
@@ -76,8 +76,10 @@
             service_level   = $result.service_level
             tags            = $tags
             notes           = $result.notes
+            customer        = $result.customer
+            object_category = $result.object_category
         }
-        $result = Invoke-RestMethod -Uri $apiDeviceURL -Body $body -Headers $headers -Method Post
+        $result = Invoke-RestMethod -Uri $apiDeviceURL -Body $body -Headers $headers -Method $method
         Add-Content -Path $reportPath -Value "[$($result.msg[2]) $($result.msg[0])]"
         Write-Host [ $result.msg[2] $result.msg[0] ]
     }

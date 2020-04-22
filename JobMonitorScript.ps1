@@ -8,30 +8,39 @@ Try {
     Import-Module -Name ($PSScriptRoot + "\SetDeviceStatus.ps1") -Force
 
     $devInfoPath = $PSScriptRoot + "\vmName.txt"    
-    [System.Collections.ArrayList]$jobs = Get-Content -Path $devInfoPath
+    $jobs = New-Object -TypeName System.Collections.ArrayList
+    foreach ($line in (Get-Content -Path $devInfoPath)) {
+        if ($line -ne '\n') {
+            $jobs.Add($line)
+        }
+    }
+    #  = Get-Content -Path $devInfoPath
 
     $DtTargetName = Read-Host -Prompt 'Please enter the DoubleTake target IP'    
     if (!$DtTargetName) {
-        $DtTargetName = "10.90.12.2"
+        # $DtTargetName = "10.90.12.2"
+        $DtTargetName = "10.90.11.22"
     }
     $DtTargetUserName = Read-Host -Prompt 'Please enter the DoubleTake target user name'    
     if (!$DtTargetUserName) {
         $DtTargetUserName = "Administrator"
     }    
     $DtTargetPassword = Read-Host -AsSecureString -Prompt "Please enter the DoubleTake target password"
-    $D42Host = Read-Host -Prompt 'Please enter the Device42 URL'    
+    $D42Host = Read-Host -Prompt 'Please enter the Device42 URL (without http:// or https:// prefixes)'    
     if (!$D42Host) {
-        $D42Host = "https://192.168.56.100/"
+        $D42Host = "https://192.168.56.100"
     }   
     else {
-        $D42Host = "https://" + $D42Host + "/"
+        if ($D42Host -and $D42Host -notmatch '(^https:\/\/).+') {
+                $D42Host = "https://" + $D42Host          
+        }
     }
     $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $DtTargetUserName, $DtTargetPassword
     # Login to your target server
     $DtTarget = New-DtServer -Name $DtTargetName -UserName $DtTargetUserName -Password $Credential.GetNetworkCredential().Password
 
-    # Create the background job
-    $async_job = {
+    # Process jobs
+    $unfinishedJobs = {
         param ($DtTarget)
 
         # jobs to be removed from main list upon completion
@@ -83,10 +92,8 @@ Try {
         While ($jobs.Count -gt 0)
     }
 
-    # Launch a background job for each device
-    # Set-PSBreakpoint -Script @($PSScriptRoot + "\JobMonitorScript.ps1") -Line 45
-    #$j = Start-Job -ScriptBlock $async_job -ArgumentList $jobInfo, $DtTarget, $reportPath
-    Invoke-Command -ScriptBlock $async_job -ArgumentList $DtTarget
+    # Launch a background job for each device    
+    Invoke-Command -ScriptBlock $unfinishedJobs -ArgumentList $DtTarget
 
 }
 Catch {
@@ -97,6 +104,8 @@ Catch {
     Add-Content -Path $reportPath -Value $ErrorMessage
 }
 Finally {
-    # Close the connections for the server object
-    Disconnect-DtServer -ServiceHost $DtTarget
+    if ($DtTarget) {
+        # Close the connections for the server object
+        Disconnect-DtServer -ServiceHost $DtTarget    
+    }
 }

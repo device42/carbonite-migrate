@@ -1,8 +1,7 @@
-# Server to ESX migration job
+# Server to Hyper-V migration job
 Try {
     # Import the Carbonite PowerShell module
     # This may be \Service\ or \Console\ depending on your installation
-    # Import-Module "C:\Program Files\Carbonite\Replication\Console\DoubleTake.PowerShell.dll"
     Import-Module "$PSScriptRoot\DoubleTake.PowerShell.dll"
     # Source server and credentials
     # Read the Migrations.csv file 
@@ -14,10 +13,9 @@ Try {
     $migrationData = Get-Content -Path $migrationPath
     $reportPath = $PSScriptRoot + "\errors.log"
     $devInfoPath = $PSScriptRoot + "\vmName.txt"
-    
 
     # Process each device from the migrations csv file
-    Foreach ($dev in $migrationData) {
+    Foreach ($dev in $migrationData) {        
         $credentials = $dev.Split(",")
 
         # Set credentials
@@ -25,8 +23,8 @@ Try {
         $DtSourceName = $credentials[1]
         $DtSourceUserName = $credentials[2]
         $DtSourcePassword = ConvertTo-SecureString -String $credentials[3] -AsPlainText -Force 
-        
-        if ($DtDeviceName -eq "device_name") {            
+
+        if ($DtDeviceName -eq "device_name") {
             continue
         }
         if (Test-Path $devInfoPath -PathType Leaf) {
@@ -34,36 +32,36 @@ Try {
             Remove-Item -Path $devInfoPath -Confirm
         }
 
-        # Target server and credentials (carbonite-template)
+        # Target server and credentials
         Add-Content -Path "$PSScriptRoot\$DtDeviceName.log" -Value "[PROCESSING $($DtDeviceName.ToUpper())]"
         Write-Host "[PROCESSING $($DtDeviceName.ToUpper())]"
         $DtTargetName = Read-Host -Prompt 'Please enter the Carbonite target IP for the migration'
         if (!$DtTargetName) {
-            $DtTargetName = '10.90.12.2'
+            $DtTargetName = '10.90.11.22'
         }
         $DtTargetUserName = Read-Host -Prompt 'Please enter the Carbonite target user name'
         if (!$DtTargetUserName) {
             $DtTargetUserName = "Administrator"
         }    
-    
+
         $DtTargetPassword = Read-Host -AsSecureString -Prompt "Please enter the Carbonite target user password"
 
         $TargetCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $DtTargetUserName, $DtTargetPassword
         $SourceCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $DtSourceUserName, $DtSourcePassword
 
-        # ESX host and credentials
+        # Hyper-V host and credentials
         # If you are using vCenter, specify your vCenter.
-        # Only specify an ESX host if you are using ESX standalone.
-        $DtHostName = Read-Host -Prompt 'Please enter the ESX host IP for the migration'
+        # Only specify an Hyper-V host if you are using Hyper-V standalone.
+        $DtHostName = Read-Host -Prompt 'Please enter the Hyper-V host IP for the migration'
         if (!$DtHostName) {
             $DtHostName = "10.90.0.12"    
         }
-        $DtHostUserName = Read-Host -Prompt 'Please enter the ESX host user name'
+        $DtHostUserName = Read-Host -Prompt 'Please enter the Hyper-V host user name'
         if (!$DtHostUserName) {
             $DtHostUserName = "root"
         }
-    
-        $DtHostPassword = Read-Host -AsSecureString -Prompt "Please enter the ESX host user password"
+
+        $DtHostPassword = Read-Host -AsSecureString -Prompt "Please enter the Hyper-V host user password"
 
         $HostCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $DtHostUserName, $DtHostPassword
 
@@ -78,9 +76,9 @@ Try {
         $DtSource = New-DtServer -Name $DtSourceName -UserName $DtSourceUserName -Password $SourceCredential.GetNetworkCredential().Password
         $DtTarget = New-DtServer -Name $DtTargetName -UserName $DtTargetUserName -Password $TargetCredential.GetNetworkCredential().Password
 
-        # Create ESX host appliance object
+        # Create Hyper-V host appliance object
         # If you are using vCenter, specify your vCenter.
-        # Only specify an ESX host if you are using ESX standalone.        
+        # Only specify an Hyper-V host if you are using Hyper-V standalone.        
         $VimTarget = New-DtServer -Name $DtHostName -Username $DtHostUserName -Password $HostCredential.GetNetworkCredential().Password -Role TargetVimServer
 
         $OtherServers = @($VimTarget)
@@ -110,11 +108,11 @@ Try {
         {DD} = 2 digit day
         {HH} = 2 digit hour
         {MN} = 2 digit minutes
-        {SS} = 2 digit seconds
+        {SS} = 2 digit second
         {MS} = milliseconds
         {IP} = Current IP of the VM to be migrated
         If no name is entered, a default name will be generated in the following format d42-carbonite-[source ip].[YYYYMMDD.HHMMSS]"
-        $UserReplicaName = Read-Host -Prompt 'Please enter the replica name to be created on the ESX server'
+        $UserReplicaName = Read-Host -Prompt 'Please enter the replica name to be created on the Hyper-V server'
         if (!$UserReplicaName) {
             $DtJobOptions.JobOptions.VRAOptions.ReplicaVmInfo.DisplayName = "d42-carbonite-$DtSourceName.$timestamp"
         }  
@@ -129,22 +127,26 @@ Try {
             Replace("{SS}", (Get-Date -Format "ss")).
             Replace("{IP}", $DtSourceName)
         }    
-       
+   
         # Make the failover start right after mirroring completes (0 - auto start, 1 - manual start)
-        $DtJobOptions.JobOptions.CoreMonitorOptions.MonitorConfiguration.ProcessingOptions = 0
+        $DtJobOptions.JobOptions.CoreMonitorOptions.MonitorConfiguration.ProcessingOptions = 0        
+        # Change the initial HyperV startup memory in case of memory errors from Carbonite Console (in bytes)
+        $DtJobOptions.JobOptions.VRAOptions.ReplicaVMInfo.Memory = 4096000000
+        $DtJobOptions.JobOptions.VRAOptions.WorkloadCustomizationOptions.ShouldShutdownSource = 0        
+
         $DtJobGuidForVraMove = New-DtJob -ServiceHost $DtTarget -Source $DtSource -OtherServers $OtherServers -JobType $DtJobType -JobOptions $DtJobOptions.JobOptions
 
         # Save the above id to a file for other scripts to use
-        # Add "vmware" subtype flag for ESX type migrations for D42
-        "$DtDeviceName,$($DtJobOptions.JobOptions.VRAOptions.ReplicaVmInfo.DisplayName),$DtJobGuidForVraMove,vmware" | 
+        # Add "hyperv" subtype flag for Hyper-V type migrations for D42
+        "$DtDeviceName,$($DtJobOptions.JobOptions.VRAOptions.ReplicaVmInfo.DisplayName),$DtJobGuidForVraMove,hyperv" | 
         Out-File -FilePath ($PSScriptRoot + "\vmName.txt") -Append
- 
+
         # Start the job
         Start-DtJob -ServiceHost $DtTarget -JobId $DtJobGuidForVraMove
     }
 }
-Catch { 
-    $ErrorMessage = "[$(Get-Date)] ERROR: " + $_.Exception.Message    
+Catch {
+    $ErrorMessage = "[$(Get-Date)] ERROR: " + $_.Exception.Message 
     $FailedItem = $_.Exception.ItemName
     Write-Error -Exception $_.Exception -Message "An error has occurred: 
     $_.Exception.ItemName"
