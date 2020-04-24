@@ -3,7 +3,7 @@
 Try {
     # Import the Carbonite PowerShell module
     # This may be \Service\ or \Console\ depending on your installation
-    Import-Module "$PSScriptRoot\DoubleTake.PowerShell.dll"
+    Import-Module "$PSScriptRoot\DoubleTake.PowerShell.dll" -Force
     # Import 'Set-D42DeviceStatus' script
     Import-Module -Name ($PSScriptRoot + "\SetDeviceStatus.ps1") -Force
 
@@ -18,8 +18,8 @@ Try {
 
     $DtTargetName = Read-Host -Prompt 'Please enter the DoubleTake target IP'    
     if (!$DtTargetName) {
-        # $DtTargetName = "10.90.12.2"
-        $DtTargetName = "10.90.11.22"
+        $DtTargetName = "10.90.12.2"
+        #$DtTargetName = "10.90.11.22"
     }
     $DtTargetUserName = Read-Host -Prompt 'Please enter the DoubleTake target user name'    
     if (!$DtTargetUserName) {
@@ -40,11 +40,11 @@ Try {
     $DtTarget = New-DtServer -Name $DtTargetName -UserName $DtTargetUserName -Password $Credential.GetNetworkCredential().Password
 
     # Process jobs
-    $unfinishedJobs = {
+    $job = {
         param ($DtTarget)
 
         # jobs to be removed from main list upon completion
-        $finishedJobs = $jobs.Clone()
+        $unfinishedJobs = $jobs.Clone()
         Do {
             # Process each jobid in the jobs file
             
@@ -77,7 +77,7 @@ Try {
                 Write-Host $jobStatus     
                 
                 if ($currentJob.Status.HighLevelState -eq 'FailedOver') {
-                    $finishedJobs.Remove($job)
+                    $unfinishedJobs.Remove($job)
                     # Check to see that the failover has been successful and mark the migrated device as no longer active in D42
                     Add-Content -Path $reportPath -Value "[Migrated $($jobInfo[0]) has been deactivated!]"
                     Write-Host [Device $jobInfo[0] has been migrated and deactivated on D42!]
@@ -85,7 +85,7 @@ Try {
                     Set-D42DeviceStatus -baseURL $D42Host -method Post -username admin -password $DtTargetPassword -devInfo $jobInfo -inService no -reportPath $reportPath
                 }
             }
-            $jobs = $finishedJobs.Clone()
+            $jobs = $unfinishedJobs.Clone()
             # Sleep 30 seconds
             Start-Sleep -Seconds 30
         }
@@ -93,7 +93,7 @@ Try {
     }
 
     # Launch a background job for each device    
-    Invoke-Command -ScriptBlock $unfinishedJobs -ArgumentList $DtTarget
+    Invoke-Command -ScriptBlock $job -ArgumentList $DtTarget
 
 }
 Catch {

@@ -13,8 +13,8 @@
     )
     
     # Authentication
-    $apiDeviceURL = $baseURL + "api/1.0/device/"
-    $apiDevice = $baseURL + "api/1.0/devices/name/" + $devInfo[0]    
+    $apiDeviceURL = $baseURL + "/api/1.0/device/"
+    $apiDevice = $baseURL + "/api/1.0/devices/name/" + $devInfo[0]    
     $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $username, $password
     $passPlain = $Credential.GetNetworkCredential().Password
     $vmPath = ($PSScriptRoot + "\vmName.txt")

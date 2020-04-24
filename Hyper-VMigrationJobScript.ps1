@@ -2,7 +2,7 @@
 Try {
     # Import the Carbonite PowerShell module
     # This may be \Service\ or \Console\ depending on your installation
-    Import-Module "$PSScriptRoot\DoubleTake.PowerShell.dll"
+    Import-Module "$PSScriptRoot\DoubleTake.PowerShell.dll" -Force
     # Source server and credentials
     # Read the Migrations.csv file 
     $migrationPath = Read-Host -Prompt 'Please enter the location of the migration CSV file (Without quotes like C:\migrations\carbonite-migration.csv)'
@@ -111,7 +111,7 @@ Try {
         {SS} = 2 digit second
         {MS} = milliseconds
         {IP} = Current IP of the VM to be migrated
-        If no name is entered, a default name will be generated in the following format d42-carbonite-[source ip].[YYYYMMDD.HHMMSS]"
+        If no name is entered, a default name will be generated in the following format d42-carbonite-[source ip].[YYYYMMDD.HHMNSS]"
         $UserReplicaName = Read-Host -Prompt 'Please enter the replica name to be created on the Hyper-V server'
         if (!$UserReplicaName) {
             $DtJobOptions.JobOptions.VRAOptions.ReplicaVmInfo.DisplayName = "d42-carbonite-$DtSourceName.$timestamp"
@@ -132,7 +132,7 @@ Try {
         $DtJobOptions.JobOptions.CoreMonitorOptions.MonitorConfiguration.ProcessingOptions = 0        
         # Change the initial HyperV startup memory in case of memory errors from Carbonite Console (in bytes)
         $DtJobOptions.JobOptions.VRAOptions.ReplicaVMInfo.Memory = 4096000000
-        $DtJobOptions.JobOptions.VRAOptions.WorkloadCustomizationOptions.ShouldShutdownSource = 0        
+        # $DtJobOptions.JobOptions.VRAOptions.WorkloadCustomizationOptions.ShouldShutdownSource = 0        
 
         $DtJobGuidForVraMove = New-DtJob -ServiceHost $DtTarget -Source $DtSource -OtherServers $OtherServers -JobType $DtJobType -JobOptions $DtJobOptions.JobOptions
 
