@@ -8,7 +8,7 @@ User requirements
 
 **The following software must be running/installed on the client computer**:
 
-1.  Device42 16.08.03+
+1.  Device42 16.10.00+
 
 2.  Carbonite console 8.3.0.293+
 
@@ -49,8 +49,8 @@ Creating a CSV export for Carbonite Migration
 
 ![alt](https://i.imgur.com/3lv9tKf.jpg)
 
-2.  On the next screen, add a desired business application or select an existing
-    one from the list, select the “Create Migration for” item from the “Action”
+2.  On the next screen, add a desired business application(s) or select an existing
+    one(s) from the list, select the “Create Migration for” item from the “Action”
     dropdown and hit the lightning button to the right.
 
 ![alt](https://i.imgur.com/Fr4uHmV.jpg)
@@ -62,26 +62,29 @@ Creating a CSV export for Carbonite Migration
 
 4.  You will be prompted to save a CSV export file with server information for
     the migration. Save it to some directory. This file is used to enter server
-    data into the PowerShell script and Carbonite job creation. \# Using a
-    PowerShell Carbonite migration script
+    data into the PowerShell script and Carbonite job creation. 
 
-5.  Install the Carbonite client.
+# Using a PowerShell Carbonite migration script
 
-6.  Download the D42 Carbonite PowerShell scripts from the D42 GitHub page at:
+1.  Install the Carbonite client.
+
+2.  Download the D42 Carbonite PowerShell scripts from the D42 GitHub page at:
     [Carbonite migration scripts](https://github.com/device42/carbonite-migrate)
 
-7.  Copy the file " C:\\Program
+3.  Copy the file " C:\\Program
     Files\\Carbonite\\Replication\\Console\\DoubleTake.PowerShell.dll" to the
     folder where you unpacked the Carbonite migrations scripts.
 
-8.  Now run the script by entering its name from the PowerShell:
-    `./ESX-EVRAMigrationJobScript.ps1`
+4.  Now run the script by entering its name from the PowerShell:    
+    `For ESX: ./ESX-EVRAMigrationJobScript.ps1`
 
-9.  Answer questions when prompted:
+    `For Hyper-V: ./Hyper-VMigrationJobScript.ps1`
 
-![alt](https://i.imgur.com/fkFYfdU.png)
+5.  Answer questions when prompted:
 
-1.  You will also be asked to create a replica name which will be the name of
+    ![alt](https://i.imgur.com/fkFYfdU.png)
+
+6.  You will also be asked to create a replica name which will be the name of
     the migrated machine on the VMware server and the name appearing in D42. You
     can use tags such as:
 
@@ -101,13 +104,13 @@ Creating a CSV export for Carbonite Migration
     equivalent to: `"d42-carbonite-[current vm ip].20200412.092311"` for
     example.
 
-2.  You should answer 'Yes' to the question about the vmName.txt file.
+7.  You should answer 'Yes' to the question about the vmName.txt file.
 
-3.  The script will execute and issue a job id \# upon completion:
+8.  The script will execute and issue a job id \# upon completion:
 
     ![alt](https://i.imgur.com/5JVARpn.png)
 
-4.  While the script is running or when it has finished, you will check the job
+9.  While the script is running or when it has finished, you will check the job
     status and modify the D42 device, which was migrated by running the job
     monitoring script `"JobMonitorScript.ps1"`.
 
@@ -123,7 +126,7 @@ Using the job monitoring script
     seconds.
 
 4.  Once the job completes and the job fails over (successfully completes), the
-    script will mark the old device as not in service
+    script will mark the old device as not in service.
 
     ![](https://i.imgur.com/4LLMFCE.png)
 
