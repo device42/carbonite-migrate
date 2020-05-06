@@ -26,8 +26,7 @@ User requirements
 5.   For convenience, you can use PowerShell ISE, which includes a dual screen
     layout where you can view the script and run it at the same time using a
     GUI. Run it by pressing the Windows key and typing “powershell ise”.
-
-    ![PS ISE](https://i.imgur.com/uFcC013.png)
+    ![PS ISE](https://s3.amazonaws.com/device42/carbonite-migrate/uFcC013.png)
 
 6.  If you never ran a PowerShell script before, you will need to perform the
     following steps:
@@ -39,7 +38,7 @@ User requirements
     -   Enable running unsigned scripts by entering: `Set-ExecutionPolicy
         RemoteSigned`
 
-    ![alt](https://i.imgur.com/WqSTevh.png)
+    ![alt](https://s3.amazonaws.com/device42/carbonite-migrate/WqSTevh.png)
 
 Creating a CSV export for Carbonite Migration
 =============================================
@@ -47,18 +46,18 @@ Creating a CSV export for Carbonite Migration
 1.  Access the D42 website and select Apps \> Business Application from the main
     toolbar.
 
-![alt](https://i.imgur.com/3lv9tKf.jpg)
+![alt](https://s3.amazonaws.com/device42/carbonite-migrate/3lv9tKf.jpg)
 
 2.  On the next screen, add a desired business application(s) or select an existing
     one(s) from the list, select the “Create Migration for” item from the “Action”
     dropdown and hit the lightning button to the right.
 
-![alt](https://i.imgur.com/Fr4uHmV.jpg)
+![alt](https://s3.amazonaws.com/device42/carbonite-migrate/Fr4uHmV.jpg)
 
 3.  Select the “Carbonite CSV” target for migration from the dropdown list and
     click the “Export” button.
 
-![alt](https://i.imgur.com/mCa2TeG.jpg)
+![alt](https://s3.amazonaws.com/device42/carbonite-migrate/mCa2TeG.jpg)
 
 4.  You will be prompted to save a CSV export file with server information for
     the migration. Save it to some directory. This file is used to enter server
@@ -82,7 +81,7 @@ Creating a CSV export for Carbonite Migration
 
 5.  Answer questions when prompted:
 
-    ![alt](https://i.imgur.com/fkFYfdU.png)
+    ![alt](https://s3.amazonaws.com/device42/carbonite-migrate/fkFYfdU.png)
 
 6.  You will also be asked to create a replica name which will be the name of
     the migrated machine on the VMware server and the name appearing in D42. You
@@ -108,7 +107,7 @@ Creating a CSV export for Carbonite Migration
 
 8.  The script will execute and issue a job id \# upon completion:
 
-    ![alt](https://i.imgur.com/5JVARpn.png)
+    ![alt](https://s3.amazonaws.com/device42/carbonite-migrate/5JVARpn.png)
 
 9.  While the script is running or when it has finished, you will check the job
     status and modify the D42 device, which was migrated by running the job
@@ -128,9 +127,9 @@ Using the job monitoring script
 4.  Once the job completes and the job fails over (successfully completes), the
     script will mark the old device as not in service.
 
-    ![](https://i.imgur.com/4LLMFCE.png)
+    ![](https://s3.amazonaws.com/device42/carbonite-migrate/4LLMFCE.png)
 
 5.  A new device which has been migrated over to, should be automatically added
     with the name you’ve given your replica in the migrate script step:
 
-    ![](https://i.imgur.com/kzsKrDo.png)
+    ![](https://s3.amazonaws.com/device42/carbonite-migrate/kzsKrDo.png)
