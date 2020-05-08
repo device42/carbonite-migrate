@@ -14,23 +14,18 @@ User requirements
 
 3. Carbonite Migrate — The source server must have Carbonite Migrate installed and licensed on it.
 
-4. **After installing the Carbonite Console, please copy the
-    "DoubleTake.PowerShell.dll" from its install directory (by default in
-    C:\\Program Files\\Carbonite\\Replication\\Console) to the root folder of
-    your scripts' location!**
-
-5. PowerShell 5.1: if you are using Windows 10, you already have the necessary
+4. PowerShell 5.1: if you are using Windows 10, you already have the necessary
     version of PowerShell, if you are using Windows 7/8/8.1; please download the
     Windows Management Framework 5.1 that includes the necessary updates to
     Windows PowerShell -\> [Download WMF
     5.1](https://www.microsoft.com/en-us/download/details.aspx?id=54616)
 
-6. For convenience, you can use PowerShell ISE, which includes a dual screen
+5. For convenience, you can use PowerShell ISE, which includes a dual screen
     layout where you can view the script and run it at the same time using a
     GUI. Run it by pressing the Windows key and typing “powershell ise”.
     ![PS ISE](https://s3.amazonaws.com/device42/carbonite-migrate/uFcC013.png)
 
-7.  If you never ran a PowerShell script before, you will need to perform the
+6.  If you never ran a PowerShell script before, you will need to perform the
     following steps:
 
     -   **Start Windows PowerShell with the "Run as administrator" option.** Only
