@@ -23,7 +23,7 @@ User requirements
     Windows PowerShell -\> [Download WMF
     5.1](https://www.microsoft.com/en-us/download/details.aspx?id=54616)
 
-5.   For convenience, you can use PowerShell ISE, which includes a dual screen
+5.  For convenience, you can use PowerShell ISE, which includes a dual screen
     layout where you can view the script and run it at the same time using a
     GUI. Run it by pressing the Windows key and typing “powershell ise”.
     ![PS ISE](https://s3.amazonaws.com/device42/carbonite-migrate/uFcC013.png)
@@ -31,7 +31,7 @@ User requirements
 6.  If you never ran a PowerShell script before, you will need to perform the
     following steps:
 
-    -   Start Windows PowerShell with the "Run as Administrator" option. Only
+    -   **Start Windows PowerShell with the "Run as administrator" option.** Only
         members of the Administrators group on the computer can change the
         execution policy.
 
@@ -74,16 +74,20 @@ Creating a CSV export for Carbonite Migration
     Files\\Carbonite\\Replication\\Console\\DoubleTake.PowerShell.dll" to the
     folder where you unpacked the Carbonite migrations scripts.
 
-4.  Now run the script by entering its name from the PowerShell:    
+4.  **Start Windows PowerShell with the "Run as administrator" option**. You can do this by clicking the Start button, typing "powershell", right-click on the PS icon and select "Run as administrator". You will see a Windows PowerShell window with "Administrator: Windows PowerShell" in the titlebar.
+![alt](https://s3.amazonaws.com/device42/carbonite-migrate/Code_ODM7dyRKI1.png)
+![alt](https://s3.amazonaws.com/device42/carbonite-migrate/powershell_25ClvB9tSu.png)
+
+5.  Run the script by entering its name from the PowerShell:    
     `For ESX: ./ESX-EVRAMigrationJobScript.ps1`
 
     `For Hyper-V: ./Hyper-VMigrationJobScript.ps1`
 
-5.  Answer questions when prompted:
+6.  Answer questions when prompted:
 
     ![alt](https://s3.amazonaws.com/device42/carbonite-migrate/fkFYfdU.png)
 
-6.  You will also be asked to create a replica name which will be the name of
+7.  You will also be asked to create a replica name which will be the name of
     the migrated machine on the VMware server and the name appearing in D42. You
     can use tags such as:
 
@@ -103,13 +107,13 @@ Creating a CSV export for Carbonite Migration
     equivalent to: `"d42-carbonite-[current vm ip].20200412.092311"` for
     example.
 
-7.  You should answer 'Yes' to the question about the vmName.txt file.
+8.  You should answer 'Yes' to the question about the vmName.txt file.
 
-8.  The script will execute and issue a job id \# upon completion:
+9.  The script will execute and issue a job id \# upon completion:
 
     ![alt](https://s3.amazonaws.com/device42/carbonite-migrate/5JVARpn.png)
 
-9.  While the script is running or when it has finished, you will check the job
+10.  While the script is running or when it has finished, you will check the job
     status and modify the D42 device, which was migrated by running the job
     monitoring script `"JobMonitorScript.ps1"`.
 
