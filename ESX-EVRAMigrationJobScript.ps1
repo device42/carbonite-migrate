@@ -2,8 +2,8 @@
 Try {
     # Import the Carbonite PowerShell module
     # This may be \Service\ or \Console\ depending on your installation
-    [Reflection.Assembly]::LoadFile("$PSScriptRoot\DoubleTake.PowerShell.dll") | out-null
-    
+    # Import-Module "C:\Program Files\Carbonite\Replication\Console\DoubleTake.PowerShell.dll"
+    Import-Module "$PSScriptRoot\DoubleTake.PowerShell.dll" -Force
     # Source server and credentials
     # Read the Migrations.csv file 
     $migrationPath = Read-Host -Prompt 'Please enter the location of the migration CSV file (Without quotes like C:\migrations\carbonite-migration.csv)'
