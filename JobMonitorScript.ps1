@@ -3,7 +3,7 @@
 Try {
     # Import the Carbonite PowerShell module
     # This may be \Service\ or \Console\ depending on your installation
-    Import-Module "$PSScriptRoot\DoubleTake.PowerShell.dll" -Force
+    Import-Module "C:\Program Files\Carbonite\Replication\Console\DoubleTake.PowerShell.dll"
     # Import 'Set-D42DeviceStatus' script
     Import-Module -Name ($PSScriptRoot + "\SetDeviceStatus.ps1") -Force
 
