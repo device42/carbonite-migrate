@@ -12,20 +12,24 @@ User requirements
 
 2. Carbonite console 8.3.0.293+
 
-3. Carbonite Migrate — The source server must have Carbonite Migrate installed and licensed on it.
+3. Carbonite Migrate — the machine you will be migrating (source) **must** have Carbonite Migrate software installed and licensed on it. This machine also needs to be added to the Carbonite console application on your Carbonite server:
+![alt](https://s3.amazonaws.com/device42/carbonite-migrate/mstsc_Fv0eg6nSnA.png)
 
-4. PowerShell 5.1: if you are using Windows 10, you already have the necessary
+4. Carbonite Target software must be installed on the replication server and the server added to the Carbonite console application. This machine will be called the "Carbonite target" in the script's questions.
+![alt](https://s3.amazonaws.com/device42/carbonite-migrate/mstsc_eqCIP7SL5Z.png)
+
+5. PowerShell 5.1: if you are using Windows 10, you already have the necessary
     version of PowerShell, if you are using Windows 7/8/8.1; please download the
     Windows Management Framework 5.1 that includes the necessary updates to
     Windows PowerShell -\> [Download WMF
     5.1](https://www.microsoft.com/en-us/download/details.aspx?id=54616)
 
-5. For convenience, you can use PowerShell ISE, which includes a dual screen
+6. For convenience, you can use PowerShell ISE, which includes a dual screen
     layout where you can view the script and run it at the same time using a
     GUI. Run it by pressing the Windows key and typing “powershell ise”.
     ![PS ISE](https://s3.amazonaws.com/device42/carbonite-migrate/uFcC013.png)
 
-6.  If you never ran a PowerShell script before, you will need to perform the
+7.  If you never ran a PowerShell script before, you will need to perform the
     following steps:
 
     -   **Start Windows PowerShell with the "Run as administrator" option.** Only
@@ -62,31 +66,30 @@ Creating a CSV export for Carbonite Migration
 
 # Using a PowerShell Carbonite migration script
 
-1.  Install the Carbonite client.
+1.  Install the Carbonite client on your machine.
 
 2.  Download the D42 Carbonite PowerShell scripts from the D42 GitHub page at:
     [Carbonite migration scripts](https://github.com/device42/carbonite-migrate)
 
-3.  Copy the file " C:\\Program
-    Files\\Carbonite\\Replication\\Console\\DoubleTake.PowerShell.dll" to the
-    folder where you unpacked the Carbonite migrations scripts.
-
-4.  **Start Windows PowerShell with the "Run as administrator" option**. You can do this by clicking the Start button, typing "powershell", right-click on the PS icon and select "Run as administrator". You will see a Windows PowerShell window with "Administrator: Windows PowerShell" in the titlebar.
+3.  **Start Windows PowerShell with the "Run as administrator" option**. You can do this by clicking the Start button, typing "powershell", right-click on the PS icon and select "Run as administrator". You will see a Windows PowerShell window with "Administrator: Windows PowerShell" in the titlebar.
 ![alt](https://s3.amazonaws.com/device42/carbonite-migrate/Code_ODM7dyRKI1.png)
 ![alt](https://s3.amazonaws.com/device42/carbonite-migrate/powershell_25ClvB9tSu.png)
 
-5.  Run the script by entering its name from the PowerShell:    
+4.  Run the script by entering its name in PowerShell:    
     `For ESX: ./ESX-EVRAMigrationJobScript.ps1`
 
     `For Hyper-V: ./Hyper-VMigrationJobScript.ps1`
 
-6.  Answer questions when prompted:
+5.  Answer questions when prompted:
+    1. Enter the location of the CSV file generated on D42 website. The source machine IP will be parsed from this file.
+    2. The "Carbonite target IP" is the replication server and the server added to the Carbonite console application. This machine stores the protected data.
+    3. The "ESX host IP/HyperV host IP" is the ESXi/HyperV VM Server which will host the replica of your source machine.
 
-    ![alt](https://s3.amazonaws.com/device42/carbonite-migrate/fkFYfdU.png)
+    ![alt](https://s3.amazonaws.com/device42/carbonite-migrate/mstsc_fEiKKgtir1.png)
 
-7.  You will also be asked to create a replica name which will be the name of
+6.  You will then be asked to create a replica name, which will be the name of
     the migrated machine on the VMware server and the name appearing in D42. You
-    can use tags such as:
+    can use the following tags:
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     {YYYY} = 4 digit year  
@@ -99,38 +102,36 @@ Creating a CSV export for Carbonite Migration
     {IP} = Current IP of the VM to be migrated
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    With these tags you can create unique names, for example entering:
+    Using these tags you can create unique names, for example entering:
     `"d42-carbonite-[source ip].[YYYYMMDD.HHMNSS]"` will create a name
-    equivalent to: `"d42-carbonite-[current vm ip].20200412.092311"` for
-    example.
+    equivalent to: `"d42-carbonite-[current vm ip].20200412.092311"`.
 
-8.  You should answer 'Yes' to the question about the vmName.txt file.
+7.  You should answer 'Yes' to the question about the vmName.txt file if asked.
 
-9.  The script will execute and issue a job id \# upon completion:
+8.  The script will execute and issue a job id \# upon completion:
 
     ![alt](https://s3.amazonaws.com/device42/carbonite-migrate/5JVARpn.png)
 
-10.  While the script is running or when it has finished, you will check the job
+9.  While the script is running or when it has finished, you will check the job
     status and modify the D42 device, which was migrated by running the job
     monitoring script `"JobMonitorScript.ps1"`.
 
 Using the job monitoring script
 ===============================
 
-1.  Run the script by entering its name from the PowerShell:
+1.  Run the script by entering its name in PowerShell:
     `./JobMonitorScript.ps1`
 
-2.  Answer questions when prompted similar to the above migration script.
+2.  Answer the questions when prompted as you have in the migration script above.
 
-3.  The script will report on the job status of the migration updating every 30
-    seconds.
+3.  The script will report the job status of the migration in 30-second intervals.
 
 4.  Once the job completes and the job fails over (successfully completes), the
     script will mark the old device as not in service.
 
     ![](https://s3.amazonaws.com/device42/carbonite-migrate/4LLMFCE.png)
 
-5.  A new device which has been migrated over to, should be automatically added
-    with the name you’ve given your replica in the migrate script step:
+5.  A new device which has been migrated over to, will be added automatically 
+    with the name you’ve given your replica in the migration script step:
 
     ![](https://s3.amazonaws.com/device42/carbonite-migrate/kzsKrDo.png)
