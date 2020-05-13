@@ -6,11 +6,11 @@ carbonite-migrate
 User requirements
 =================
 
-**The following software must be running/installed on the user's computer**:
+**The following software must be running/installed and running**:
 
 1. Device42 16.10.00+
 
-2. Carbonite console 8.3.0.293+
+2. Carbonite Console 8.3.0.293+
 
 3. Carbonite Migrate — the machine you will be migrating (source) **must** have Carbonite Migrate software installed and licensed on it. This machine also needs to be added to the Carbonite console application on your Carbonite server:
 ![alt](https://s3.amazonaws.com/device42/carbonite-migrate/mstsc_Fv0eg6nSnA.png)
@@ -18,7 +18,7 @@ User requirements
 4. Carbonite Target software must be installed on the replication server and the server added to the Carbonite console application. This machine will be called the "Carbonite target" in the script's questions.
 ![alt](https://s3.amazonaws.com/device42/carbonite-migrate/mstsc_eqCIP7SL5Z.png)
 
-5. PowerShell 5.1: if you are using Windows 10, you already have the necessary
+5. PowerShell 5.1 on the machine running the scripts: if you are using Windows 10, you already have the necessary
     version of PowerShell, if you are using Windows 7/8/8.1; please download the
     Windows Management Framework 5.1 that includes the necessary updates to
     Windows PowerShell -\> [Download WMF
