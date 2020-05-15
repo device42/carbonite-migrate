@@ -30,16 +30,16 @@ Try {
     }
     #  = Get-Content -Path $devInfoPath
 
-    $DtTargetName = Read-Host -Prompt 'Please enter the DoubleTake target IP'    
+    $DtTargetName = Read-Host -Prompt 'Please enter the Virtual Recovery Appliance IP for the migration'    
     if (!$DtTargetName) {
         $DtTargetName = "10.90.12.2"
         #$DtTargetName = "10.90.11.22"
     }
-    $DtTargetUserName = Read-Host -Prompt 'Please enter the DoubleTake target user name'    
+    $DtTargetUserName = Read-Host -Prompt 'Please enter the username'    
     if (!$DtTargetUserName) {
         $DtTargetUserName = "Administrator"
     }    
-    $DtTargetPassword = Read-Host -AsSecureString -Prompt "Please enter the DoubleTake target password"
+    $DtTargetPassword = Read-Host -AsSecureString -Prompt "Please enter the password"
     $D42Host = Read-Host -Prompt 'Please enter the Device42 URL (without http:// or https:// prefixes)'    
     if (!$D42Host) {
         $D42Host = "https://192.168.56.100"
