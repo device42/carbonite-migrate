@@ -1,4 +1,18 @@
 # Server to ESX migration job
+add-type @"
+using System.Net;
+using System.Security.Cryptography.X509Certificates;
+public class TrustAllCertsPolicy : ICertificatePolicy {
+    public bool CheckValidationResult(
+        ServicePoint srvPoint, X509Certificate certificate,
+        WebRequest request, int certificateProblem) {
+        return true;
+    }
+}
+"@
+$AllProtocols = [System.Net.SecurityProtocolType]'Ssl3,Tls,Tls11,Tls12'
+[System.Net.ServicePointManager]::SecurityProtocol = $AllProtocols
+[System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
 Try {
     # Import the Carbonite PowerShell module
     # This may be \Service\ or \Console\ depending on your installation
@@ -30,23 +44,23 @@ Try {
             continue
         }
         if (Test-Path $devInfoPath -PathType Leaf) {
-            Write-Host "A previous device info file was found, it should be removed..."
+            Write-Host "A device info file from a previous run was found, it should be removed..."
             Remove-Item -Path $devInfoPath -Confirm
         }
 
         # Target server and credentials (carbonite-template)
         Add-Content -Path "$PSScriptRoot\$DtDeviceName.log" -Value "[PROCESSING $($DtDeviceName.ToUpper())]"
         Write-Host "[PROCESSING $($DtDeviceName.ToUpper())]"
-        $DtTargetName = Read-Host -Prompt 'Please enter the Carbonite target IP for the migration'
+        $DtTargetName = Read-Host -Prompt 'Please enter the Virtual Recovery Appliance IP for the migration'
         if (!$DtTargetName) {
             $DtTargetName = '10.90.12.2'
         }
-        $DtTargetUserName = Read-Host -Prompt 'Please enter the Carbonite target user name'
+        $DtTargetUserName = Read-Host -Prompt 'Please enter the username'
         if (!$DtTargetUserName) {
             $DtTargetUserName = "Administrator"
         }    
     
-        $DtTargetPassword = Read-Host -AsSecureString -Prompt "Please enter the Carbonite target user password"
+        $DtTargetPassword = Read-Host -AsSecureString -Prompt "Please enter the password"
 
         $TargetCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $DtTargetUserName, $DtTargetPassword
         $SourceCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $DtSourceUserName, $DtSourcePassword
@@ -58,12 +72,12 @@ Try {
         if (!$DtHostName) {
             $DtHostName = "10.90.0.12"    
         }
-        $DtHostUserName = Read-Host -Prompt 'Please enter the ESX host user name'
+        $DtHostUserName = Read-Host -Prompt 'Please enter the username'
         if (!$DtHostUserName) {
             $DtHostUserName = "root"
         }
     
-        $DtHostPassword = Read-Host -AsSecureString -Prompt "Please enter the ESX host user password"
+        $DtHostPassword = Read-Host -AsSecureString -Prompt "Please enter the password"
 
         $HostCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $DtHostUserName, $DtHostPassword
 

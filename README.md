@@ -6,13 +6,13 @@ carbonite-migrate
 User requirements
 =================
 
-**The following software must be running/installed and running**:
+**The following software must be running/installed**:
 
 1. Device42 16.10.00+
 
-2. Carbonite Console 8.3.0.293+
+2. Carbonite Replication Console 8.3.0.293+
 
-3. Carbonite Migrate — the machine you will be migrating (source) **must** have Carbonite Migrate software installed and licensed on it. This machine also needs to be added to the Carbonite console application on your Carbonite server:
+3. Carbonite Migrate — the machine you will be migrating (source) **must** have Carbonite Migrate software installed and licensed on it. This machine also needs to be added to the Carbonite Replication Console on your Carbonite server:
 ![alt](https://s3.amazonaws.com/device42/carbonite-migrate/mstsc_Fv0eg6nSnA.png)
 
 4. Carbonite Target software must be installed on the replication server and the server added to the Carbonite console application. This machine will be called the "Carbonite target" in the script's questions.
@@ -84,6 +84,32 @@ Creating a CSV export for Carbonite Migration
     1. Enter the location of the CSV file generated on D42 website. The source machine IP will be parsed from this file.
     2. The "Carbonite target IP" is the replication server and the server added to the Carbonite console application. This machine stores the protected data.
     3. The "ESX host IP/HyperV host IP" is the ESXi/HyperV VM Server which will host the replica of your source machine.
+    4. When asked for the type of job you will be creating, please be aware that the available choices differ for Windows and Linux OSs. The following jobs are available: 
+
+        **Availability for Windows jobs:**
+        - **FilesAndFolders** — Files and folders
+        - **ClusterAwareFilesAndFolders** — Cluster-aware files and folders
+        - **SQL** — SQL
+        - **ClusterAwareSql** — Cluster-aware SQL
+        - **FullServerFailover** — Full server
+        - **VRA** — Full server to ESX or full server to Hyper-V
+
+        **Migrate for Windows jobs:**
+        - **MoveDataOnlyMigration** — Files and folders migration
+        - **MoveServerMigration** — Full server migration
+        - **VraMove** — Full server to ESX migration or full server to Hyper-V migration
+
+        **Availability for Linux jobs:**    
+        - **LinuxFilesAndFolders** — Files and folders
+        - **LinuxFullServerFailover** — Full server
+        - **Lvra** — Full server to ESX
+
+        **Migrate for Linux jobs:**
+        - **LinuxMoveServerMigration** — Full server migration
+        - **MoveLvra** — Full server to ESX migration
+
+        **Jobs common to Windows/Linux**:
+        - **Diagnostics** — Throughput Diagnostic Utility
 
     ![alt](https://s3.amazonaws.com/device42/carbonite-migrate/mstsc_fEiKKgtir1.png)
 
