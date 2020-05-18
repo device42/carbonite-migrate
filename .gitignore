@@ -1,0 +1,5 @@
+test.ps1
+*.txt
+*.log
+*.csv
+*.dll
