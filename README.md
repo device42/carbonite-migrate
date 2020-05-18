@@ -86,30 +86,12 @@ Creating a CSV export for Carbonite Migration
     3. The "ESX host IP/HyperV host IP" is the ESXi/HyperV VM Server which will host the replica of your source machine.
     4. When asked for the type of job you will be creating, please be aware that the available choices differ for Windows and Linux OSs. The following jobs are available: 
 
-        **Availability for Windows jobs:**
-        - **FilesAndFolders** — Files and folders
-        - **ClusterAwareFilesAndFolders** — Cluster-aware files and folders
-        - **SQL** — SQL
-        - **ClusterAwareSql** — Cluster-aware SQL
-        - **FullServerFailover** — Full server
-        - **VRA** — Full server to ESX or full server to Hyper-V
-
         **Migrate for Windows jobs:**
-        - **MoveDataOnlyMigration** — Files and folders migration
-        - **MoveServerMigration** — Full server migration
         - **VraMove** — Full server to ESX migration or full server to Hyper-V migration
 
-        **Availability for Linux jobs:**    
-        - **LinuxFilesAndFolders** — Files and folders
-        - **LinuxFullServerFailover** — Full server
-        - **Lvra** — Full server to ESX
-
-        **Migrate for Linux jobs:**
-        - **LinuxMoveServerMigration** — Full server migration
+        **Migrate for Linux jobs:**        
         - **MoveLvra** — Full server to ESX migration
 
-        **Jobs common to Windows/Linux**:
-        - **Diagnostics** — Throughput Diagnostic Utility
 
     ![alt](https://s3.amazonaws.com/device42/carbonite-migrate/mstsc_fEiKKgtir1.png)
 
